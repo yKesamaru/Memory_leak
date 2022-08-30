@@ -161,7 +161,7 @@ $ python3 -m memray flamegraph output.bin
 ![](https://raw.githubusercontent.com/yKesamaru/Memory_leak/master/img/PASTE_IMAGE_2022-08-30-10-37-45.png)
 
 公式ドキュメントには下図のようなライブモードも紹介されています。
-![](https://warehouse-camo.ingress.cmh1.psfhosted.org/09e20bd2572aaf5b236a173553cb9b4b606f423d/68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f626c6f6f6d626572672f6d656d7261792f6d61696e2f646f63732f5f7374617469632f696d616765732f6c6976655f616e696d617465642e676966)
+![](https://raw.githubusercontent.com/yKesamaru/Memory_leak/master/img/memray_live.gif)
 
 # まとめ
 Pythonのメモリー周りはなかなか奥深いですね。
