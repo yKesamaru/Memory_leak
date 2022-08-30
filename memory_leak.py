@@ -6,7 +6,7 @@ from pympler import muppy, summary
 
 
 class Memory_leak:
-    __doc__ = "Output the result of the tracemalloc module with formatted."
+    __doc__ = "Output the result of the tracemalloc and Pympler module with formatted."
     __author__ = "Yoshitsugu Kesamaru (yKesamaru)"
     __email__ = "y.kesamaru@tokai-kaoninsho.com"
     __maintainer__ = "yKesamaru"
