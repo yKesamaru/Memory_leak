@@ -1,5 +1,5 @@
 # Search memory leak points on Python code
-`memory_leak.py` provides useful class methods for finding memory leaks in your Python code.
+`memory_leak.py` provides useful methods for finding memory leaks in your Python code.
 
 # Example
 ## Usage
