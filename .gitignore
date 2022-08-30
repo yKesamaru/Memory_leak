@@ -1,2 +1,10 @@
 Python: Memory leakポイントを探す.code-workspace
 backup_output
+zenn.md
+bin
+lib
+lib64
+share
+pyvenv.cfg
+.vscode/launch.json
+.vscode/settings.json

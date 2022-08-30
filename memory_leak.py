@@ -2,7 +2,7 @@ import linecache
 import tracemalloc
 
 import psutil
-from pympler import muppy, summary
+from pympler import muppy, summary, tracker
 
 
 class Memory_leak:
@@ -31,9 +31,9 @@ class Memory_leak:
         - Pympler
             - https://pympler.readthedocs.io/en/latest/
         """    
-        self.limit = limit
-        self.key_type = key_type
-        self.nframe = kwargs.get('nframe')
+        self.limit: int = limit
+        self.key_type: str = key_type
+        self.nframe: int | None = kwargs.get('nframe')
 
         self.used_memory1 = psutil.virtual_memory().used
 
@@ -42,7 +42,7 @@ class Memory_leak:
         print("-" * 30)
 
 
-    def __display_line(self, snapshot, key_type='lineno', limit=5):
+    def __display_line(self, snapshot, key_type='lineno', limit=5) -> None:
         self.snapshot = snapshot
         self.key_type = key_type
         self.limit = limit
@@ -71,13 +71,13 @@ class Memory_leak:
 
         other = stats[self.limit:]
         if other:
-            size = sum(stat.size for stat in other)
+            size: int = sum(stat.size for stat in other)
             print("%s, Other: %.1f MiB" % (len(other), size / 1024 / 1048))
-        total = sum(stat.size for stat in stats)
+        total: int = sum(stat.size for stat in stats)
         print("Total allocated size: %.1f MiB" % (total / 1024 / 1048))
 
 
-    def __display_traceback(self, stats, key_type='traceback', limit=5):
+    def __display_traceback(self, stats, key_type='traceback', limit=5) -> None:
         self.stats = stats
         self.key_type = key_type
         self.limit = limit
@@ -101,7 +101,7 @@ class Memory_leak:
         print("Total allocated size: %.1f MiB" % (total / 1024 / 1048))
 
 
-    def memory_leak_analyze_start(self):
+    def memory_leak_analyze_start(self) -> None:
         if self.key_type == 'traceback':
             if isinstance(self.nframe, int):
                 tracemalloc.start(self.nframe)
@@ -123,8 +123,10 @@ class Memory_leak:
         else:
             print("The argument 'key_type' must specify either 'lineno' or 'traceback'."); exit()
 
+        self.tr = tracker.SummaryTracker()
 
-    def memory_leak_analyze_stop(self):
+
+    def memory_leak_analyze_stop(self) -> None:
         if self.key_type == 'traceback':
             snapshot2 = tracemalloc.take_snapshot()
             stats = snapshot2.compare_to(self.snapshot1, 'traceback')
@@ -142,6 +144,10 @@ class Memory_leak:
         print("-" * 30)
         # pympler
         print("\nPympler report")
+        print("<Summary>")
         all_objects = muppy.get_objects()
         sum1 = summary.summarize(all_objects)
         summary.print_(sum1)
+        print("-" * 30)
+        print("<Summary_diff>")
+        self.tr.print_diff()

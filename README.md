@@ -31,30 +31,50 @@ Top 2 lines
     Size: 3.5 MiB
     lines = fp.readlines()
 -----
-20483, Other: 29.4 MiB
-Total allocated size: 36.4 MiB
+20865, Other: 30.6 MiB
+Total allocated size: 37.6 MiB
 ------------------------------
-Used Memory: 1.5 GiB
+Used Memory: 1.3 GiB
 ------------------------------
 
 Pympler report
+<Summary>
                        types |   # objects |   total size
 ============================ | =========== | ============
-                       tuple |      384549 |     23.37 MB
-               numpy.ndarray |         922 |     14.04 MB
-                         str |       67733 |     10.87 MB
-                        dict |       21341 |      8.73 MB
-                        code |       22285 |      3.79 MB
-                        list |        7797 |      3.66 MB
-                        type |        3793 |      3.52 MB
-                         set |        1645 |    896.99 KB
-                       bytes |         190 |    717.59 KB
-  builtin_function_or_method |        7838 |    551.11 KB
-                     weakref |        7686 |    540.42 KB
-     collections.OrderedDict |         224 |    401.42 KB
+                       tuple |      422214 |     25.70 MB
+               numpy.ndarray |         922 |     14.02 MB
+                         str |       74797 |     11.38 MB
+                        dict |       21407 |      9.17 MB
+                        list |       14535 |      4.58 MB
+                        code |       22431 |      3.82 MB
+                        type |        3820 |      3.54 MB
+                         set |        1649 |    899.34 KB
+                       bytes |         190 |    705.78 KB
+  builtin_function_or_method |        7831 |    550.62 KB
+                     weakref |        7700 |    541.41 KB
+     collections.OrderedDict |         235 |    406.22 KB
                  abc.ABCMeta |         263 |    307.12 KB
-           inspect.Parameter |        4336 |    271.00 KB
-           method_descriptor |        3785 |    266.13 KB
+           inspect.Parameter |        4373 |    273.31 KB
+           method_descriptor |        3801 |    267.26 KB
+------------------------------
+<Summary_diff>
+                       types |   # objects |   total size
+============================ | =========== | ============
+                       tuple |      410069 |     25.02 MB
+               numpy.ndarray |         847 |     14.01 MB
+                        list |       24733 |     10.53 MB
+                         str |       52483 |      6.66 MB
+                        dict |       11524 |      4.97 MB
+                        type |        2073 |      2.01 MB
+                        code |       11649 |      2.00 MB
+                       bytes |          78 |    700.15 KB
+     collections.OrderedDict |         235 |    406.22 KB
+                         set |         659 |    403.51 KB
+  builtin_function_or_method |        4798 |    337.36 KB
+                     weakref |        4004 |    281.53 KB
+           inspect.Parameter |        4373 |    273.31 KB
+                         int |        8384 |    230.48 KB
+                   frozenset |         140 |    181.53 KB
 ```
 
 # Augments
