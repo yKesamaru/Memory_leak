@@ -168,7 +168,7 @@ $ python3 -m memray flamegraph output.bin
 # まとめ
 Pythonのメモリー周りはなかなか奥深いですね。
 最後に紹介した`Memray`はこれからどんどん大きくなりそうで興味深いです。
-それでは。
+
 
 # 謝辞
 [@nariaki3551](https://github.com/nariaki3551)(Nariaki Tateiwa)様から`setup.py`のプルリクを頂きました。
