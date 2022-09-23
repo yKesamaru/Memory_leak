@@ -89,6 +89,9 @@ Memory_leak class takes 3 augments.
 # License
 MIT license
 
+# Special thanks
+Special thanks to [@nariaki3551](https://github.com/nariaki3551)(Nariaki Tateiwa) who created `setup.py`.
+
 # Reference
 - tracemalloc
     - [En]
