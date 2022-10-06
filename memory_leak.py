@@ -29,6 +29,8 @@ Reference:
     - Pympler
         - https://pympler.readthedocs.io/en/latest/
 
+Document:
+    https://ykesamaru.github.io/Memory_leak/
 GitHub:
     https://github.com/yKesamaru/Memory_leak
 Zenn:
