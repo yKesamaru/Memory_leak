@@ -86,6 +86,9 @@ Memory_leak class takes 3 augments.
 - nframe:(int, optional)
   - This can be specified only when key_type is 'traceback'. Defaults to 5.
 
+# Document
+https://ykesamaru.github.io/Memory_leak/index.html
+
 # License
 MIT license
 
