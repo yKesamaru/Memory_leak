@@ -1,11 +1,71 @@
+"""`memory_leak` provides useful methods for finding memory leaks in your Python code.
+
+`memory_leak` makes to output the Python standard library `tracemalloc` in an easy-to-read format.   
+It also comes with a summary using the popular library `Pympler`.   
+
+It will be useful in the early stages when you have no idea where the memory leak is.  
+After that, attach the `@profile()` decorator to the methods likely to cause memory leaks using `memory_profiler` module, you can search the point at memory leak.
+
+Args:
+    limit:(int) Limit output lines.
+    key_type:(str) Select 'lineno' or 'traceback' output. Defaults to 'lineno'.
+    nframe:(int, optional) This can be specified only when key_type is 'traceback'. Defaults to 5.
+
+Example:
+    >>> from memory_leak import Memory_leak
+    >>> m = Memory_leak(limit = 2, key_type = 'lineno')
+    >>> m.memory_leak_analyze_start()
+    >>> 
+    >>> # ...Your application code
+    >>> 
+    >>> m.memory_leak_analyze_stop()
+
+Reference:
+    - tracemalloc
+        - [En]
+            - https://docs.python.org/3/library/tracemalloc.html
+        - [ja]
+            - https://docs.python.org/ja/3/library/tracemalloc.html
+    - Pympler
+        - https://pympler.readthedocs.io/en/latest/
+
+GitHub:
+    https://github.com/yKesamaru/Memory_leak
+Zenn:
+    https://zenn.dev/ykesamaru/articles/bd403aa6d03100
+    
+Special thanks to @nariaki3551(Nariaki Tateiwa) who created setup.py.
+"""
 import linecache
 import tracemalloc
+from typing import Union
 
 import psutil
 from pympler import muppy, summary, tracker
 
 
 class Memory_leak:
+    """Output the result of the tracemalloc and Pympler module with formatted.
+
+    Args:
+        limit:(int) Limit output lines.
+        key_type:(str) Select 'lineno' or 'traceback' output. Defaults to 'lineno'.
+        nframe:(int, optional) This can be specified only when key_type is 'traceback'. Defaults to 5.
+
+    Example:
+    >>> # Import Memory_leak class
+    >>> from memory_leak import Memory_leak
+    >>> # Make instance
+    >>> m = Memory_leak(limit = 2, key_type = 'lineno')
+    >>> # Specify start point
+    >>> m.memory_leak_analyze_start()
+
+    >>> # ...Your application code
+
+    >>> # Specify end point
+    >>> m.memory_leak_analyze_stop()
+    """
+
     __doc__ = "Output the result of the tracemalloc and Pympler module with formatted."
     __author__ = "Yoshitsugu Kesamaru (yKesamaru)"
     __email__ = "y.kesamaru@tokai-kaoninsho.com"
@@ -15,25 +75,19 @@ class Memory_leak:
     __version__ = "v0.0.1"
 
     def __init__(self, limit: int, key_type: str, **kwargs: int) -> None:
-        """Output the result of the tracemalloc module with formatted.
+        """Load `psutil.virtual_memory`.
 
         Args:
-            limit:(int) Limit output lines.
-            key_type:(str) Select 'lineno' or 'traceback' output. Defaults to 'lineno'.
-            nframe:(int, optional) This can be specified only when key_type is 'traceback'. Defaults to 5.
-        
-        For reference, See bellow
-        - tracemalloc
-            - [En]
-                - https://docs.python.org/3/library/tracemalloc.html#
-            - [ja]
-                - https://docs.python.org/ja/3/library/tracemalloc.html#
-        - Pympler
-            - https://pympler.readthedocs.io/en/latest/
-        """    
+            limit (int): Number of output lines
+            key_type (str): `lineno` or `traceback`
+            nframe (int): If you specify `key_type` to `traceback`, you have to specify `nframe`. `nframe` must be integer.
+        """        
         self.limit: int = limit
         self.key_type: str = key_type
-        self.nframe: int | None = kwargs.get('nframe')
+        if kwargs.get('nframe'):
+            self.nframe: Union[int, None] = kwargs.get('nframe')
+        else:
+            self.nframe = 5
 
         self.used_memory1 = psutil.virtual_memory().used
 
@@ -43,6 +97,7 @@ class Memory_leak:
 
 
     def __display_line(self, snapshot, key_type='lineno', limit=5) -> None:
+        """Code shaping."""
         self.snapshot = snapshot
         self.key_type = key_type
         self.limit = limit
@@ -102,6 +157,7 @@ class Memory_leak:
 
 
     def memory_leak_analyze_start(self) -> None:
+        """Specify start point."""
         if self.key_type == 'traceback':
             if isinstance(self.nframe, int):
                 tracemalloc.start(self.nframe)
@@ -114,12 +170,17 @@ class Memory_leak:
                     )
                 )
             else:
-                print("nframe: int")
+                print("""ERROR:
+    If you specify `traceback`, you must specify `nframe` which is integer.
+
+    Example:
+    >>> m = Memory_leak(limit = 5, key_type = 'traceback', nframe = 3)
+                """)
                 exit(0)
-        
+
         elif self.key_type == 'lineno':
             tracemalloc.start()
-        
+
         else:
             print("The argument 'key_type' must specify either 'lineno' or 'traceback'."); exit()
 
@@ -127,11 +188,12 @@ class Memory_leak:
 
 
     def memory_leak_analyze_stop(self) -> None:
+        """Specify end point."""
         if self.key_type == 'traceback':
             snapshot2 = tracemalloc.take_snapshot()
             stats = snapshot2.compare_to(self.snapshot1, 'traceback')
             self.__display_traceback(stats, 'traceback', self.limit)
-        
+
         elif self.key_type == 'lineno':
             snapshot = tracemalloc.take_snapshot()
             self.__display_line(snapshot, 'lineno', self.limit)

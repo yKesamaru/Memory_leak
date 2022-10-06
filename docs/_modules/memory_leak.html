@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>memory_leak &mdash; memory_leak v0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> memory_leak
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../memory_leak.html">memory_leak module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">setup module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">memory_leak</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>memory_leak</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for memory_leak</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;`memory_leak` provides useful methods for finding memory leaks in your Python code.</span>
+
+<span class="sd">`memory_leak` makes to output the Python standard library `tracemalloc` in an easy-to-read format.   </span>
+<span class="sd">It also comes with a summary using the popular library `Pympler`.   </span>
+
+<span class="sd">It will be useful in the early stages when you have no idea where the memory leak is.  </span>
+<span class="sd">After that, attach the `@profile()` decorator to the methods likely to cause memory leaks using `memory_profiler` module, you can search the point at memory leak.</span>
+
+<span class="sd">Args:</span>
+<span class="sd">    limit:(int) Limit output lines.</span>
+<span class="sd">    key_type:(str) Select &#39;lineno&#39; or &#39;traceback&#39; output. Defaults to &#39;lineno&#39;.</span>
+<span class="sd">    nframe:(int, optional) This can be specified only when key_type is &#39;traceback&#39;. Defaults to 5.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    &gt;&gt;&gt; from memory_leak import Memory_leak</span>
+<span class="sd">    &gt;&gt;&gt; m = Memory_leak(limit = 2, key_type = &#39;lineno&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; m.memory_leak_analyze_start()</span>
+<span class="sd">    &gt;&gt;&gt; </span>
+<span class="sd">    &gt;&gt;&gt; # ...Your application code</span>
+<span class="sd">    &gt;&gt;&gt; </span>
+<span class="sd">    &gt;&gt;&gt; m.memory_leak_analyze_stop()</span>
+
+<span class="sd">Reference:</span>
+<span class="sd">    - tracemalloc</span>
+<span class="sd">        - [En]</span>
+<span class="sd">            - https://docs.python.org/3/library/tracemalloc.html</span>
+<span class="sd">        - [ja]</span>
+<span class="sd">            - https://docs.python.org/ja/3/library/tracemalloc.html</span>
+<span class="sd">    - Pympler</span>
+<span class="sd">        - https://pympler.readthedocs.io/en/latest/</span>
+
+<span class="sd">GitHub:</span>
+<span class="sd">    https://github.com/yKesamaru/Memory_leak</span>
+<span class="sd">Zenn:</span>
+<span class="sd">    https://zenn.dev/ykesamaru/articles/bd403aa6d03100</span>
+<span class="sd">    </span>
+<span class="sd">Special thanks to @nariaki3551(Nariaki Tateiwa) who created setup.py.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">linecache</span>
+<span class="kn">import</span> <span class="nn">tracemalloc</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">from</span> <span class="nn">pympler</span> <span class="kn">import</span> <span class="n">muppy</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">tracker</span>
+
+
+<div class="viewcode-block" id="Memory_leak"><a class="viewcode-back" href="../memory_leak.html#memory_leak.Memory_leak">[docs]</a><span class="k">class</span> <span class="nc">Memory_leak</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Output the result of the tracemalloc and Pympler module with formatted.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        limit:(int) Limit output lines.</span>
+<span class="sd">        key_type:(str) Select &#39;lineno&#39; or &#39;traceback&#39; output. Defaults to &#39;lineno&#39;.</span>
+<span class="sd">        nframe:(int, optional) This can be specified only when key_type is &#39;traceback&#39;. Defaults to 5.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; # Import Memory_leak class</span>
+<span class="sd">    &gt;&gt;&gt; from memory_leak import Memory_leak</span>
+<span class="sd">    &gt;&gt;&gt; # Make instance</span>
+<span class="sd">    &gt;&gt;&gt; m = Memory_leak(limit = 2, key_type = &#39;lineno&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; # Specify start point</span>
+<span class="sd">    &gt;&gt;&gt; m.memory_leak_analyze_start()</span>
+
+<span class="sd">    &gt;&gt;&gt; # ...Your application code</span>
+
+<span class="sd">    &gt;&gt;&gt; # Specify end point</span>
+<span class="sd">    &gt;&gt;&gt; m.memory_leak_analyze_stop()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;Output the result of the tracemalloc and Pympler module with formatted.&quot;</span>
+    <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Yoshitsugu Kesamaru (yKesamaru)&quot;</span>
+    <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;y.kesamaru@tokai-kaoninsho.com&quot;</span>
+    <span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;yKesamaru&quot;</span>
+    <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+    <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;yKesamaru&quot;</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;v0.0.1&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">key_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load `psutil.virtual_memory`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            limit (int): Number of output lines</span>
+<span class="sd">            key_type (str): `lineno` or `traceback`</span>
+<span class="sd">            nframe (int): If you specify `key_type` to `traceback`, you have to specify `nframe`. `nframe` must be integer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key_type</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nframe&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nframe</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nframe&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nframe</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">used_memory1</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">used</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Called &#39;memory_leak.py&#39; with &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="si">}</span><span class="s2">&#39; mode...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__display_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="s1">&#39;lineno&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Code shaping.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">snapshot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="o">.</span><span class="n">filter_traces</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;frozen importlib._bootstrap&gt;&quot;</span><span class="p">),</span>
+                <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;frozen importlib._bootstrap_external&gt;&quot;</span><span class="p">),</span>
+                <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
+                <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;unknown&gt;&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">statistics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top </span><span class="si">%s</span><span class="s2"> lines&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">traceback</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;#</span><span class="si">%s</span><span class="s2">: File:</span><span class="si">%s</span><span class="se">\n</span><span class="s2">    Line: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">    Size: </span><span class="si">%.1f</span><span class="s2"> MiB&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1048</span><span class="p">))</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">linecache</span><span class="o">.</span><span class="n">getline</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">frame</span><span class="o">.</span><span class="n">lineno</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="n">linecache</span><span class="o">.</span><span class="n">clearcache</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="n">other</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, Other: </span><span class="si">%.1f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1048</span><span class="p">))</span>
+        <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total allocated size: </span><span class="si">%.1f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1048</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">__display_traceback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="s1">&#39;traceback&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top </span><span class="si">%s</span><span class="s2"> traceback&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">stat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">traceback</span><span class="o">.</span><span class="n">format</span><span class="p">():</span>  <span class="c1"># traceback.format(limit=5, most_recent_first=True)</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">other</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="n">other</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, Other: </span><span class="si">%.1f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1048</span><span class="p">))</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total allocated size: </span><span class="si">%.1f</span><span class="s2"> MiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span> <span class="mi">1048</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Memory_leak.memory_leak_analyze_start"><a class="viewcode-back" href="../memory_leak.html#memory_leak.Memory_leak.memory_leak_analyze_start">[docs]</a>    <span class="k">def</span> <span class="nf">memory_leak_analyze_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Specify start point.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="s1">&#39;traceback&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nframe</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">tracemalloc</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nframe</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">snapshot1</span> <span class="o">=</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="n">take_snapshot</span><span class="p">()</span><span class="o">.</span><span class="n">filter_traces</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;frozen importlib._bootstrap&gt;&quot;</span><span class="p">),</span>
+                        <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;frozen importlib._bootstrap_external&gt;&quot;</span><span class="p">),</span>
+                        <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
+                        <span class="n">tracemalloc</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&lt;unknown&gt;&quot;</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;ERROR:</span>
+<span class="s2">    If you specify `traceback`, you must specify `nframe` which is integer.</span>
+
+<span class="s2">    Example:</span>
+<span class="s2">    &gt;&gt;&gt; m = Memory_leak(limit = 5, key_type = &#39;traceback&#39;, nframe = 3)</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="s1">&#39;lineno&#39;</span><span class="p">:</span>
+            <span class="n">tracemalloc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The argument &#39;key_type&#39; must specify either &#39;lineno&#39; or &#39;traceback&#39;.&quot;</span><span class="p">);</span> <span class="n">exit</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">SummaryTracker</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Memory_leak.memory_leak_analyze_stop"><a class="viewcode-back" href="../memory_leak.html#memory_leak.Memory_leak.memory_leak_analyze_stop">[docs]</a>    <span class="k">def</span> <span class="nf">memory_leak_analyze_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Specify end point.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="s1">&#39;traceback&#39;</span><span class="p">:</span>
+            <span class="n">snapshot2</span> <span class="o">=</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="n">take_snapshot</span><span class="p">()</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">snapshot2</span><span class="o">.</span><span class="n">compare_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot1</span><span class="p">,</span> <span class="s1">&#39;traceback&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__display_traceback</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;traceback&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="s1">&#39;lineno&#39;</span><span class="p">:</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="n">take_snapshot</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__display_line</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="s1">&#39;lineno&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">)</span>
+
+        <span class="n">tracemalloc_memory</span> <span class="o">=</span> <span class="n">tracemalloc</span><span class="o">.</span><span class="n">get_tracemalloc_memory</span><span class="p">()</span>
+        <span class="n">used_memory2</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">used</span>
+        <span class="n">used_memory</span> <span class="o">=</span> <span class="n">used_memory2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">used_memory1</span> <span class="o">-</span> <span class="n">tracemalloc_memory</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Used Memory: </span><span class="si">%.1f</span><span class="s2"> GiB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">used_memory</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">/</span><span class="mi">1048</span> <span class="o">/</span> <span class="mi">1074</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="c1"># pympler</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pympler report&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;Summary&gt;&quot;</span><span class="p">)</span>
+        <span class="n">all_objects</span> <span class="o">=</span> <span class="n">muppy</span><span class="o">.</span><span class="n">get_objects</span><span class="p">()</span>
+        <span class="n">sum1</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">all_objects</span><span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="n">sum1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;Summary_diff&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr</span><span class="o">.</span><span class="n">print_diff</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, yKesamaru.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
