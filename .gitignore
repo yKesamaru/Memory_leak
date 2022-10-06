@@ -5,6 +5,7 @@ bin
 lib
 lib64
 share
+include
 pyvenv.cfg
 .vscode/launch.json
 .vscode/settings.json

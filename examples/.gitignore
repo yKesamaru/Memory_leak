@@ -1,0 +1,13 @@
+方眼紙
+inkscape.svg
+Python: Memory leakポイントを探す.code-workspace
+.vscode
+__pycache__
+share
+bin
+.git
+lib64
+lib
+include
+.mypy_cache
+backup_output
