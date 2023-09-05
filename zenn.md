@@ -1,6 +1,8 @@
 # Python：メモリーリークの探し方3選
 探すのが難しいと言われるメモリーリーク。先日[あるプロジェクト](https://github.com/yKesamaru/FACE01_SAMPLE)のメモリーリークをFixしましたのでその時に使用した3つの方法をご紹介します。
 
+![](https://raw.githubusercontent.com/yKesamaru/Memory_leak/master/img/image823.png)
+
 # 1. Memory_leak
 まず拙作の`Memory_leak`からご紹介します。
 https://github.com/yKesamaru/Memory_leak

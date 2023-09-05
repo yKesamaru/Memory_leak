@@ -1,4 +1,8 @@
 opencv-python>=4.6.0.66
 mediapipe>=0.8.11
-pympler
-
+mediapipe>=0.8.11
+psutil>=5.9.2
+Pympler>=1.0.1
+pyparsing>=3.0.9
+PySimpleGUI>=4.60.3
+typing_extensions>=4.3.0
